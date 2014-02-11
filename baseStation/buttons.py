@@ -34,5 +34,6 @@ def teleautoswitch(button):
 	if button.name == 'Autonav':
 		link.send('R06')
 		button.setname('Teleop')
+		
 def screenshot(button):
 	pygame.image.save(ui.Widget.window, 'screenshots/{}.png'.format(int(time.time())))
