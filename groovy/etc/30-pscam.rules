@@ -1,0 +1,10 @@
+#This is the UDEV rules file that gives the cameras a static name
+#so that the divergence mapping algorithm works. 
+#Place it in /etc/udev/rules.d/
+
+#Change the KERNELS line to the USB port the cameras are using.
+
+#Left
+KERNELS=="3-1:1.0", SYMLINK+="video-left"
+#Right
+KERNELS=="3-2:1.0", SYMLINK+="video-right"
