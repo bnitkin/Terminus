@@ -461,9 +461,11 @@ class Map(Widget):
 		#1* N/S = 110.567 km at 0* N at the equator and 111.699 km at 90* N Avg 111.13km/(* N/S)
 		scale = self.dlon*SCALE_SIZE*111130
 		scale = round(scale, -int(math.log10(abs(scale))))
+		scaletext = '{:.0f} m'.format(scale)
+		if scale > 1000: scaletext = '{:.0f} km'.format(scale/1000)
 		pygame.draw.line(self, SCALE_COLOR, (MAP_MARGIN*4, self.get_height()-4*MAP_MARGIN), (MAP_MARGIN*4+scale/111130/self.dlon * self.get_width(), self.get_height()-4*MAP_MARGIN), BORDER_THICKNESS)
-		scale = label.render('{:.0f} m'.format(scale), True, FONT_COLOR)
-		pygame.Surface.blit(self, scale, (MAP_MARGIN*4, self.get_height()-4*MAP_MARGIN-scale.get_height()))
+		scalesurf = label.render(scaletext, True, FONT_COLOR)
+		pygame.Surface.blit(self, scalesurf, (MAP_MARGIN*4, self.get_height()-4*MAP_MARGIN-scalesurf.get_height()))
 
 	def drawwaypoint(self, waypoint):
 		pygame.draw.circle(self, waypoint[1], self.conv(waypoint[0]), FEATURE_SIZE)
