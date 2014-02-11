@@ -436,8 +436,8 @@ class Map(Widget):
 		latc = (latmax-latmin)*RESIZE_AREA+latmin
 		lonc = (lonmax-lonmin)*RESIZE_AREA+lonmin
 		latlonratio = math.cos(latc * 3.1415/180)
-		latrange = max(2*(latmax-latmin), 10E-4) #Set a hard minimum of 10E-4 degrees, about 10 meters.
-		lonrange = max(2*(lonmax-lonmin), 10E-4) #The minimum size for the canvas, including buffer area.
+		latrange = max(2*(latmax-latmin), 10E-5) #Set a hard minimum of 10E-4 degrees, about 10 meters.
+		lonrange = max(2*(lonmax-lonmin), 10E-5) #The minimum size for the canvas, including buffer area.
 		if self.get_height() * latrange / latlonratio > self.get_width() * lonrange: #Enlarge longitude
 			lonrange = 1.0*self.get_width()/self.get_height()  * latrange / latlonratio
 		else: #Enlarge latitude
