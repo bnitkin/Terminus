@@ -59,10 +59,12 @@ TEXTBOX_TITLE_COLOR = WHITE
 MAP_FILL = Color('#7AFF83')
 MAP_MARGIN = 5
 MAP_BORDER = BLACK
+SCALE_COLOR = BLACK
 FEATURE_SIZE = 5 #Radius of features on maps.
 TRACK_COLOR = BLACK
 RESIZE_AREA = 0.5 #The width and height of the screen occupied by data immediately after a resize.
 MAX_AREA = 0.9 #The fraction of the map usable by data. 0.9 sets a 10% edge buffer, and resizes when the buffer's violated.
+SCALE_SIZE = 0.15 #The rough size of the scale, as a fraction of map width.
 BORDER_THICKNESS = 4
 
 TICKS = 8
