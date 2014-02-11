@@ -436,7 +436,7 @@ class Map(Widget):
 		latc = (latmax-latmin)*RESIZE_AREA+latmin
 		lonc = (lonmax-lonmin)*RESIZE_AREA+lonmin
 		latlonratio = math.cos(latc * 3.1415/180)
-		latrange = max(2*(latmax-latmin), 10E-5) #Set a hard minimum of 10E-4 degrees, about 10 meters.
+		latrange = max(2*(latmax-latmin), 10E-5) #Set a hard minimum of 10E-6 degrees, about 1 meter.
 		lonrange = max(2*(lonmax-lonmin), 10E-5) #The minimum size for the canvas, including buffer area.
 		if self.get_height() * latrange / latlonratio > self.get_width() * lonrange: #Enlarge longitude
 			lonrange = 1.0*self.get_width()/self.get_height()  * latrange / latlonratio
@@ -513,9 +513,8 @@ if __name__ == '__main__':
 	f = open('res/dummygpsdata')
 	m = Map('Map', 0 , 0, 6*GRIDDING, 5*GRIDDING)
 	Widget.window = window
-	print m
-	d = f.readline().split('"')
-	if len(d) > 3 : m.point((float(d[1]), float(d[3])), RED)
+
+	print pygame.time.get_ticks()
 	
 	while True:
 		#Redraw gauges every frame
@@ -523,11 +522,14 @@ if __name__ == '__main__':
 		if len(d) > 3 : m.set((float(d[1]), float(d[3])))
 		else: 
 			f.seek(0)
+			print pygame.time.get_ticks()
+			m.redraw()
+			print pygame.time.get_ticks()
 			m.cleartrack()
 		for gauge in Widget.widgets.values():
 			gauge.blit()
 		pygame.display.update()
-		clock.tick(FRAMERATE/2)
+		clock.tick(FRAMERATE*2)
 
 		#Event handling and callbacks
 		for event in pygame.event.get():
