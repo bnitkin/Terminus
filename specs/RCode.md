@@ -1,4 +1,5 @@
 R##|Name|Details|Return data|Arg 1 (Return Data)|Arg 2|Sample data
+---|---|---|---|---|---|---
 R00|Keep-alive|Reset robot watchdog||||
 R01|Kill|Software disable motors||||
 R02|Power down|Power off laptop remotely||||
