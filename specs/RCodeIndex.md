@@ -1,4 +1,4 @@
-R##|Name|Details|Return data|Arg 1 (Return Data)|Arg 2|Sample data
+R##|Name|Details|Return data|Arg 1|Arg 2|Sample data
 ---|---|---|---|---|---|---
 R00|Keep-alive|Reset robot watchdog||||
 R01|Kill|Software disable motors||||
