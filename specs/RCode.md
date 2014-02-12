@@ -16,12 +16,17 @@ and constantly transmits all enabled data, based on current state.
 
 R-Codes consist of the letter R followed by two numbers, 00 through 99. Expanding into alpha (a-z) will 
 provide additional codes if needed. Codes refer to pieces of data, so have different meanings depending 
-on direction. For instance, the master sends R07 1 to set mode. The robot provides its current mode with 
+on direction. For instance, the master sends *R07 1* to set mode. The robot provides its current mode with 
 the same code: 
-```prime,R07\n1\n.```
+```
+prime,R07\n1\n
+```
 
 The format varies slightly between the master and slave. For the master, arguments are space-delimited, 
-and reside on the same line as the code. R33 1.0 1.1 sends code 33 with arguments 1.0 and 1.1.
+and reside on the same line as the code. The following code transmits code 33 with arguments 1.0 and 1.1.
+```
+R33 1.0 1.1
+```
 
 The slave codes look slightly different to account for the variety of data the slave sends. If a valid 
 control code randomly appeared in the data transmission, flow control would break. The robot sends the 
@@ -56,24 +61,24 @@ Notes
 For signal processing, JPEG images always start with 0xFFD8 and end with 0xFFD9. 
 JPEG's are likely to be the heaviest data that moves across the radio link.
 
-The regular expression ^prime,R[0-9][0-9]$ matches flags and only flags. 
+The regular expression *^prime,R[0-9][0-9]$* matches flags and only flags. 
 
 ROS is natively metric, so R-codes will be, too. Ranges are in meters and speeds in m/s.
 
 ##Sample Session
 Comments are marked by #'s
 
-Master Transmission	|Slave Transmission	
----|---
-R07 1 #Set robot to state 1	|prime,R13
-R37 1.2, 0.2 #Set twist	12.2|
-|	prime,R16
-|	340.2
-|	prime,R53
-|	192	
-|	prime,R07 #Robot is in state 1 – confirmed.
-|	1
-|	prime,R00
-|	prime,R00
-|prime,R00
-|...
+|Master Transmission	|Slave Transmission	
+|---|---
+|R07 1 #Set robot to state 1	|prime,R13
+|R37 1.2, 0.2 #Set twist	12.2|12.2
+||	prime,R16
+||	340.2
+||	prime,R53
+||	192	
+||	prime,R07 #Robot is in state 1 – confirmed.
+||	1
+||	prime,R00
+||	prime,R00
+||prime,R00
+||...
