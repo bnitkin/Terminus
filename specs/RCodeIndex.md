@@ -7,7 +7,7 @@ R03||||||
 R04||||||
 R05|Enable teleop|R05-R07 switch active control stations.||||
 R06|Enable autonomous|Only one of the three control methods can be active at once.||||
-R07|Mode|Returns current mode (1=auto, 0=tele)||0 or 1||
+R07|Mode|Returns current mode (1=auto, 0=tele)|0 or 1|||
 R08|State|Sets c||||
 R09||||||
 R10|Battery voltage|Retrieve battery voltage from robot|Volts|||22.4
