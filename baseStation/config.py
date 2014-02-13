@@ -100,7 +100,8 @@ DIGITAL_COLOR = Color(116, 4, 0, 255)
 
 ##Frontend settings
 TITLE="Optimus' Base Station - Team Terminus - 2014"
-TITLE_ICON = sys.path[0]+'/res/terminus.jpg'
+TITLE_ICON_WIN = sys.path[0]+'/res/primesmiley.gif'
+TITLE_ICON_MAC = sys.path[0]+'/res/primebody.gif'
 BACKGROUND = Color(26, 26, 26)
 
 FRAMERATE = 30
