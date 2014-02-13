@@ -5,9 +5,10 @@
 # Configuration file
 # Single file for all config variables used in the base station. 
 
+from pygame import Color
+import sys
 
 #Colors
-from pygame import Color
 WHITE = Color(255, 255, 255, 255)
 BLACK = Color(  0,   0,   0, 255)
 RED =   Color(255,   0,   0, 255)
@@ -19,25 +20,43 @@ WIDGET_WIDTH = 200
 WIDGET_HEIGHT = 200
 WIDGET_RADIUS = 90
 
+#Basic colors
 DIAL_FILL = WHITE
 DIAL_BORDER = BLACK
 
-TICK_COLOR = BLACK
+#Center color dial config
 CENTER_BORDER = BLACK
 CENTER_VAL = 100
 CENTER_SAT = 100
-
-LIGHT_RADIUS = 35
-
-#A gauge's color changes depending on its value, for easier reading.
 CENTER_HUE_NORMAL = 112
 CENTER_HUE_DANGER = 0
+CENTER_RADIUS = 15
+LIGHT_RADIUS = 35
+
+#Needle config (compass, speedo, heading)
 NEEDLE_FILL = Color(0, 10, 81, 255)
 NEEDLE_BORDER = BLACK
-
-CENTER_RADIUS = 15
 NEEDLE_RADIUS = 70
 
+#Settings for minor ticks on speedo etc
+TICKS = 8
+TICK_LENGTH = 10
+TICK_COLOR = BLACK
+SCALE_START = 3.1415* 1/3
+SCALE_END =   3.1415* 5/3
+SCALE_RANGE = SCALE_END - SCALE_START
+
+#Text spacing for speedo, compass, etc
+LABEL_INSET = 25
+DIGITAL_FROM_BOTTOM = 50
+TITLE_FROM_BOTTOM = 65
+
+#Colors for warning overlays
+WARN_BORDER = Color(142, 3, 0, 255)
+WARN_FILL = Color(194, 5, 0, 255)
+WARN_TEXT = WHITE
+
+#Button config
 BUTTON_WIDTH = 100
 BUTTON_HEIGHT = 50
 BUTTON_MARGIN = 5
@@ -48,6 +67,7 @@ BUTTON_NORMAL = Color(192, 192, 192)
 BUTTON_HOVER = Color(170, 170, 170)
 BUTTON_PRESS = Color(120, 120, 120)
 
+#Textbox config
 TEXTBOX_WIDTH = 200
 TEXTBOX_HEIGHT = 100
 TEXTBOX_TEXT_BORDER = 10
@@ -56,6 +76,7 @@ TEXTBOX_FILL = WHITE
 TEXTBOX_BORDER = BLACK
 TEXTBOX_TITLE_COLOR = WHITE
 
+#Map config
 MAP_FILL = Color('#7CFA4C')
 MAP_MARGIN = 5
 MAP_BORDER = BLACK
@@ -67,39 +88,25 @@ MAX_AREA = 0.9 #The fraction of the map usable by data. 0.9 sets a 10% edge buff
 SCALE_SIZE = 0.15 #The rough size of the scale, as a fraction of map width.
 BORDER_THICKNESS = 4
 
-TICKS = 8
-TICK_LENGTH = 10
-LABEL_INSET = 25
-DIGITAL_FROM_BOTTOM = 50
-TITLE_FROM_BOTTOM = 65
-
-SCALE_START = 3.1415* 1/3
-SCALE_END =   3.1415* 5/3
-SCALE_RANGE = SCALE_END - SCALE_START
-
-WARN_BORDER = Color(142, 3, 0, 255)
-WARN_FILL = Color(194, 5, 0, 255)
-WARN_TEXT = WHITE
-
 #Fonts
-LABEL_NAME = 'res/AlteHaasGroteskRegular.ttf'
+LABEL_NAME = sys.path[0]+'/res/AlteHaasGroteskRegular.ttf'
 LABEL_SIZE = 12
-TITLE_NAME = 'res/imagine_font.ttf'
+TITLE_NAME = sys.path[0]+'/res/imagine_font.ttf'
 TITLE_SIZE = 13
-DIGITAL_NAME = 'res/digital_counter_7.ttf'
+DIGITAL_NAME = sys.path[0]+'/res/digital_counter_7.ttf'
 DIGITAL_SIZE = 30
 FONT_COLOR = BLACK
 DIGITAL_COLOR = Color(116, 4, 0, 255)
 
 ##Frontend settings
 TITLE="Optimus' Base Station - Team Terminus - 2014"
-TITLE_ICON = 'res/terminus.jpg'
+TITLE_ICON = sys.path[0]+'/res/terminus.jpg'
 BACKGROUND = Color(26, 26, 26)
 
 FRAMERATE = 30
 
 GRIDDING = 98
-MAX_VEL = 2 #Max velocity, m/s
+MAX_VEL = 2 #Max velocity, m/s; used in teleop mode.
 MAX_TURN = 2
 
 #Rangefinder warning distances
@@ -112,8 +119,3 @@ PORT = '/dev/ttyUSB0'
 TIME_WRITE = 50 #ms; Maximum time to spend writing to serial per loop. (higher values fill read buffer)
 TIME_MIN = 70 #ms; Minimum time for a read/write serial loop (higher values reduce CPU)
 RATE_AVG = 20 #Number of samples to use for rate averaging.
-
-#States
-UNKNOWN = 0
-READY = 1
-BUSY  = 2

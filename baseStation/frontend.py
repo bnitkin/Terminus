@@ -117,13 +117,16 @@ def shutdown():
 	pygame.quit()
 	sys.stderr.write(">> Done.")
 	sys.exit()
-try:
-	main()
-except Exception, e:
-	sys.stderr.write("!! Exception encountered. Shutting down.\n")
-	sys.stderr.write("!! "+str(e)+'\n')
-	shutdown()
-except KeyboardInterrupt, k:
-	sys.stderr.write(">> Recieved Ctrl+C\n")
-	shutdown()
+
+def run():
+	try:
+		main()
+	except Exception, e:
+		sys.stderr.write("!! Exception encountered. Shutting down.\n")
+		sys.stderr.write("!! "+str(e)+'\n')
+		shutdown()
+	except KeyboardInterrupt, k:
+		sys.stderr.write(">> Recieved Ctrl+C\n")
+		shutdown()
 	
+if __name__ == '__main__': run()
