@@ -56,7 +56,7 @@ def main():
 	ui.Text('Accuracy  m', '00.0', 11*GRIDDING, 5*GRIDDING)
 	ui.Text('Satellites Tracked', '0', 11*GRIDDING, 6*GRIDDING)
 	#Radio health
-	ui.Text('TX Rate  B/s', '0', 7*GRIDDING, 7*GRIDDING)
+	ui.Text('Serial Framerate', '0', 7*GRIDDING, 7*GRIDDING)
 	ui.Text('RX Rate  B/s', '0', 9*GRIDDING, 7*GRIDDING)
 	#Buttons!
 	ui.Button('E-Stop', buttons.kill, 0, 7.5*GRIDDING)
@@ -81,6 +81,7 @@ def main():
 		#R-Code handling
 		rcode.setGauges(serialHandle) #Flushes the serial buffer and sets gauges
 		rcode.setState(serialHandle) #Sets robot state to enable/disable gauges
+		demo()
 		
 		#Event handling and callbacks
 		for event in pygame.event.get():
@@ -107,8 +108,21 @@ def main():
 
 		pygame.display.update()
 		clock.tick(FRAMERATE)
-
-
+		
+f = open('res/dummygpsdata')
+def demo():
+	"""Tests some functions without a working serial link"""
+	rcode.alive('1\n')
+	d = f.readline().split('"')
+	if len(d) > 3 : rcode.position(d[1]+'\n'+d[3]+'\n')
+	rcode.accuracy('12.12345\n')
+	rcode.lrange('3\n')
+	rcode.crange('4\n')
+	rcode.rrange('5\n')
+	rcode.twist('1.0\n1.3\n')
+	rcode.heading('120\n')
+	rcode.image(open('res/primebody.gif').read())
+	
 def shutdown():
 	sys.stderr.write(">> Shutting down.\n")
 	sys.stderr.write(">> Requesting serial link shutdown.\n")
