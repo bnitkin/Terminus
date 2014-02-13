@@ -40,24 +40,34 @@ The robot-base station link has 5 states, 1-5. (The wired Arduino link shouldn't
 bandwidth issues, so states aren't defined.) The following is a list of codes transmitted 
 in each state; it's tuned to the base station's needs.
 
-1) – R00 (alive)
-2) - Everything from 1 and:
+1)
+ - R00 (alive)
+
+2) 
+- Everything from 1 and:
 - R07 (autonomous)
 - R37 (actual twist)
 - R53 (heading)
-3) - Everything from 2 and:
+
+3) 
+- Everything from 2 and:
 - R60 (left range)
 - R61 (center range)
 - R62 (right range)
 - R16 (uptime)
-4) - Everything from 3 and:
-- R26 (current waypoint)
--R40 (position)
--R41 (accuracy)
--R42 (num satellites)
-5) - Everything from 4 and:
+
+4) 
+ - Everything from 3 and:
+ - R26 (current waypoint)
+ - R40 (position)
+ - R41 (accuracy)
+ - R42 (num satellites)
+
+5) 
+- Everything from 4 and:
 - R70 (image)
-Notes
+
+##Notes
 For signal processing, JPEG images always start with 0xFFD8 and end with 0xFFD9. 
 JPEG's are likely to be the heaviest data that moves across the radio link.
 
