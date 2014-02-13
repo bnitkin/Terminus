@@ -22,9 +22,11 @@ def main():
 	window = pygame.display.set_mode((13*GRIDDING, int(8.5*GRIDDING)))
 	window.fill(BACKGROUND)
 	pygame.display.set_caption(TITLE)
-	pygame.display.set_icon(pygame.image.load(TITLE_ICON))
 	ui.Widget.window = window
-	
+	if sys.platform.startswith('darwin'): #OSX has a nice big canvas for drawing icons. Why not take advantage?
+		pygame.display.set_icon(pygame.image.load(TITLE_ICON_MAC))
+	else:
+		pygame.display.set_icon(pygame.image.load(TITLE_ICON_WIN))
 	sys.stderr.write(">> Initializing joystick.\n")
 	if pygame.joystick.get_count(): 
 		pygame.joystick.Joystick(1)
