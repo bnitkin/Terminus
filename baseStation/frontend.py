@@ -34,20 +34,25 @@ def main():
 	
 	sys.stderr.write(">> Populating widgets.\n")
 	#Setup buttons & layout
+
 	#Camera & Map
 	ui.Image('PS3 Eye', 4, 4, 640, 480)
 	ui.Map('Map', 7*GRIDDING, 0, 6*GRIDDING, 5*GRIDDING)
+
 	#Core gauges
 	ui.Gauge('Speed  m/s', -3, 3, 1*GRIDDING, 5*GRIDDING)
 	ui.Compass('Heading', 3*GRIDDING, 5*GRIDDING)
 	ui.Gauge('Turn Rate', -3, 3, 5*GRIDDING, 5*GRIDDING)
+
 	#Rangefinders
 	ui.Light('Left', 1.5*GRIDDING, 7*GRIDDING) 
 	ui.Light('Center', 3.5*GRIDDING, 7*GRIDDING)
 	ui.Light('Right', 5.5*GRIDDING, 7*GRIDDING) 
+
 	#Status lights
 	ui.Light('Alive', 0*GRIDDING, 5*GRIDDING)
 	ui.Light('Auto', 0*GRIDDING, 6*GRIDDING)
+
 	#GPS stats
 	ui.Text('Current Latitude', '00.00000N', 7*GRIDDING, 5*GRIDDING)
 	ui.Text('Current Longitude', '00.00000W', 9*GRIDDING, 5*GRIDDING)
@@ -55,16 +60,17 @@ def main():
 	ui.Text('Waypoint Longitude', '00.00000W', 9*GRIDDING, 6*GRIDDING)
 	ui.Text('Accuracy  m', '00.0', 11*GRIDDING, 5*GRIDDING)
 	ui.Text('Satellites Tracked', '0', 11*GRIDDING, 6*GRIDDING)
+
 	#Radio health
 	ui.Text('Serial Framerate', '0', 7*GRIDDING, 7*GRIDDING)
 	ui.Text('RX Rate  B/s', '0', 9*GRIDDING, 7*GRIDDING)
+
 	#Buttons!
 	ui.Button('E-Stop', buttons.kill, 0, 7.5*GRIDDING)
 	ui.Button('Shutdown', buttons.poweroff, 0*GRIDDING, 8*GRIDDING)
 	ui.Button('Teleop', buttons.teleautoswitch, 0*GRIDDING, 7*GRIDDING)	
 	ui.Button('PrtScr', buttons.screenshot, 12*GRIDDING, 8*GRIDDING)
 
-	#TODO: Printscreen button
 	#Stats
 	ui.Text('Uptime', '0', 11*GRIDDING, 7*GRIDDING)
 	

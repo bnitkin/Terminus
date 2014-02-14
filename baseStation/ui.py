@@ -370,7 +370,15 @@ class Map(Widget):
 		#On mouseclicked, wipe 1/2 of the track and rescale.
 		self.track = self.track[len(self.track)/2:]
 		self.redraw()
-		
+	#The map reblits poorly if it's disabled, so the warning is suppressed.
+	def disable(self):
+		return
+	def enable(self):
+		return
+	def setwarn(self):
+		pass
+	def clearwarn(self):
+		pass
 	def reset(self):
 		self.minlon = 10000
 		self.minlat = 10000
@@ -515,8 +523,6 @@ if __name__ == '__main__':
 	f = open('res/dummygpsdata')
 	m = Map('Map', 0 , 0, 6*GRIDDING, 5*GRIDDING)
 	Widget.window = window
-
-	print pygame.time.get_ticks()
 	
 	while True:
 		#Redraw gauges every frame
@@ -524,9 +530,7 @@ if __name__ == '__main__':
 		if len(d) > 3 : m.set((float(d[1]), float(d[3])))
 		else: 
 			f.seek(0)
-			print pygame.time.get_ticks()
 			m.redraw()
-			print pygame.time.get_ticks()
 			m.cleartrack()
 		for gauge in Widget.widgets.values():
 			gauge.blit()

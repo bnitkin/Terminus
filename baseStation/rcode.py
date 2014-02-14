@@ -26,7 +26,7 @@ def set(name, value):
 	try:
 		ui.Widget.widgets[name].set(value)
 	except:
-		sys.stderr.write("!! Could not set {} to {}.\n".fo)
+		sys.stderr.write("!! Could not set {} to {}.\n".format(name, value))
 
 def disable(name): 
 	ui.Widget.widgets[name].disable()
@@ -85,8 +85,11 @@ def setGauges(serial):
 	
 	while serial.hasCode():
 		code, data = serial.readCode()
-		
-		
+		try:
+			codeIndex[code](data) #Call function from dict
+		except:
+			sys.stderr.write("!! Could not parse \n{}\n{}\n".format(code, data))
+
 
 def alive(data):
 	serclock.tick() #Alive is the robot's pulse.
