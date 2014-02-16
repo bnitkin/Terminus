@@ -368,7 +368,7 @@ class Map(Widget):
 	
 	def mouseClicked(self):
 		#On mouseclicked, wipe 1/2 of the track and rescale.
-		self.track = self.track[len(self.track)/2:]
+		self.track = self.track[len(self.track)/2+1:]
 		self.redraw()
 	#The map reblits poorly if it's disabled, so the warning is suppressed.
 	def disable(self):
@@ -408,6 +408,7 @@ class Map(Widget):
 	
 	def cleartrack(self):
 		self.clean = False
+		self.resize = True
 		self.track = []
 		self.reset()
 
@@ -419,6 +420,10 @@ class Map(Widget):
 	def draw(self):
 		self.clean = True
 		if self.resize: self.redraw()
+		if len(self.track): pos = '({: 10.5f}, {: 10.5f})'.format(self.track[-1][0], self.track[-1][1])
+		else: pos = '(  0.00000,  0.00000)'
+		current = label.render(pos, True, FONT_COLOR, MAP_FILL)
+		pygame.Surface.blit(self, current, (self.get_width()-current.get_width()-MAP_MARGIN*2, self.get_height()-2*MAP_MARGIN-current.get_height()))
 		
 	def redraw(self):
 		self.clean = True

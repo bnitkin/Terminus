@@ -87,6 +87,8 @@ RESIZE_AREA = 0.5 #The width and height of the screen occupied by data immediate
 MAX_AREA = 0.9 #The fraction of the map usable by data. 0.9 sets a 10% edge buffer, and resizes when the buffer's violated.
 SCALE_SIZE = 0.15 #The rough size of the scale, as a fraction of map width.
 BORDER_THICKNESS = 4
+MAX_MOVE = 1000 #Maximum offset between sequential points on map, m.
+
 
 #Fonts
 LABEL_NAME = sys.path[0]+'/res/AlteHaasGroteskRegular.ttf'
