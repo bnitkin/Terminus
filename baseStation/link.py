@@ -90,6 +90,7 @@ class Serial(threading.Thread):
 	#Keep track of sending and recieving speeds, B/s
 	def txSpeed(self): return self.txRate
 	def rxSpeed(self): return self.rxRate
+	
 	def inWaiting(self):
 		"""Returns the number of lines in the recieved buffer."""
 		return len(self.rx)
@@ -99,49 +100,19 @@ class Serial(threading.Thread):
 		return len(self.tx)
 		
 	def readLine(self):
-		"""Reads a single line from the buffer, with the original trailing newline stripped."""
+		"""Reads a single line from the buffer, with the original trailing newline stripped. Blocking until line fetched."""
+		while not len(self.rx): time.delay(10) #Check every 10ms for new data.
 		return self.rx.popleft()
+		
+	def previewLine(self, line = 0):
+		"""Returns a line from the buffer without popping. Blocks on empty cache."""
+		while not len(self.rx): time.delay(10) #Check every 10ms for new data.
+		return self.rx[line]
 		
 	def write(self, data):
 		"""Writes a string to the transmission buffer"""
 		self.tx.append(data)
-	
-	def writeCode(self, code):
-		"""Adds protocol fiddley bits to codes before writing."""
-		#XXX Rewrite for R-code slave
-		self.write(code+'\n')
-	
-	def readCode(self):
-		"""Reads a full code from the recieved buffer. 
-		Purges any partial code in the buffer."""	
-		#XXX Rewrite for R-code slave
-		code = ''
-		data = ''
-		while True:
-			line = self.readLine()
-			if line.startswith('prime'): 
-				#Starting read now.
-				if code == '': code = line[6:] #Clip the 'prime,' and '\n'
-				#Hit another code; we're done reading. Push the last line back into the buffer and return.
-				else: 
-					self.rx.appendleft(line)
-					return code, data
-					
-			elif code != '': #The line isn't a code and we're recording
-				data += line + '\n' #Restore newline to data.
-		
-	def hasCode(self):
-		"""Returns whether there's a full code to read."""
-		#XXX Rewrite for R-code slave
-
-		#A complete code requires two 'prime' lines: one to start the code and one to end it.
-		codes = 0
-		temprx = list(self.rx)
-		for line in temprx:
-			if line.startswith('prime'): codes += 1
-			if codes == 2: return True
-		return False
-		
+			
 	def stop(self): 
 		"""Kills the thread."""
 		self.alive = False
