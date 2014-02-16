@@ -6,33 +6,38 @@
 #These functions manipulate individual buttons. 
 
 import pygame, time
-import ui, link
+import ui
+
+serial = None
 
 def alive(widget):
 	try:
-		link.send('R00')
+		serial.send('R00')
 		widget.set(True)
 	except:
 		widget.set(False)
 def kill(button):
 	if button.name == 'E-Stop':
-		link.writeCode('R01')
+		serial.write('R01\n')
 		button.setname('Resume')
 	else: 
-		link.writeCode('R00')
+		serial.write('R00\n')
 		button.setname('E-Stop')
 		
 def poweroff(button):
 	if button.name != 'Confirm?': button.setname('Confirm?')
-	else: link.writeCode('R02')
+	else: serial.write('R02')
 	
 def teleautoswitch(button):
 	if button.name == 'Teleop':
-		link.writeCode('R05')
+		serial.write('R05\n')
 		button.setname('Autonav')
 	if button.name == 'Autonav':
-		link.writeCode('R06')
+		serial.write('R06\n')
 		button.setname('Teleop')
 		
 def screenshot(button):
 	pygame.image.save(ui.Widget.window, 'screenshots/{}.png'.format(int(time.time())))
+
+def mapreset(button):
+	ui.Widget.widgets['Map'].cleartrack()

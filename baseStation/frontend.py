@@ -19,14 +19,20 @@ def main():
 	sys.stderr.write(">> Loading pygame.\n")
 	pygame.init()
 	clock = pygame.time.Clock() #Rate-limits framerate to 30fps.
-	window = pygame.display.set_mode((13*GRIDDING, int(8.5*GRIDDING)))
-	window.fill(BACKGROUND)
+	#Title and icon
 	pygame.display.set_caption(TITLE)
-	ui.Widget.window = window
 	if sys.platform.startswith('darwin'): #OSX has a nice big canvas for drawing icons. Why not take advantage?
 		pygame.display.set_icon(pygame.image.load(TITLE_ICON_MAC))
 	else:
 		pygame.display.set_icon(pygame.image.load(TITLE_ICON_WIN))
+
+	window = pygame.display.set_mode((13*GRIDDING, int(8.5*GRIDDING)))
+	window.fill(BACKGROUND)
+	#Global variable sharing
+	ui.Widget.window = window
+	rcode.serial = serialHandle
+	buttons.serial = serialHandle
+	
 	sys.stderr.write(">> Initializing joystick.\n")
 	if pygame.joystick.get_count(): 
 		pygame.joystick.Joystick(1)
@@ -70,7 +76,7 @@ def main():
 	ui.Button('Shutdown', buttons.poweroff, 0*GRIDDING, 8*GRIDDING)
 	ui.Button('Teleop', buttons.teleautoswitch, 0*GRIDDING, 7*GRIDDING)	
 	ui.Button('PrtScr', buttons.screenshot, 12*GRIDDING, 8*GRIDDING)
-
+	ui.Button('Reset Map', buttons.mapreset, 11*GRIDDING, 8*GRIDDING)
 	#Stats
 	ui.Text('Uptime', '0', 11*GRIDDING, 7*GRIDDING)
 	
@@ -85,9 +91,8 @@ def main():
 			gauge.blit()
 		
 		#R-Code handling
-		rcode.setGauges(serialHandle) #Flushes the serial buffer and sets gauges
-		rcode.setState(serialHandle) #Sets robot state to enable/disable gauges
-		demo()
+		rcode.setGauges() #Flushes the serial buffer and sets gauges
+		rcode.setState() #Sets robot state to enable/disable gauges
 		
 		#Event handling and callbacks
 		for event in pygame.event.get():
@@ -106,7 +111,7 @@ def main():
 				linear = joystick.get_axis(0) * MAX_VEL
 				angular = joystick.get_axis(1) * MAX_TURN
 				#Queue the current velocity for sending to the robot.
-				serialHandle.write('R30 {:.3} {:.3}'.format(linear, angular))
+				serialHandle.write('R30 {:.3} {:.3}\n'.format(linear, angular))
 			if event.type == pygame.JOYBUTTONDOWN: 
 				pass
 			if event.type == pygame.JOYBUTTONUP: 
@@ -115,20 +120,6 @@ def main():
 		pygame.display.update()
 		clock.tick(FRAMERATE)
 		
-f = open('res/dummygpsdata')
-def demo():
-	"""Tests some functions without a working serial link"""
-	rcode.alive('1\n')
-	d = f.readline().split('"')
-	if len(d) > 3 : rcode.position(d[1]+'\n'+d[3]+'\n')
-	rcode.accuracy('12.12345\n')
-	rcode.lrange('3\n')
-	rcode.crange('4\n')
-	rcode.rrange('5\n')
-	rcode.twist('1.0\n1.3\n')
-	rcode.heading('120\n')
-	rcode.image(open('res/primebody.gif').read())
-	
 def shutdown():
 	sys.stderr.write(">> Shutting down.\n")
 	sys.stderr.write(">> Requesting serial link shutdown.\n")
@@ -150,5 +141,5 @@ def run():
 	except KeyboardInterrupt, k:
 		sys.stderr.write(">> Recieved Ctrl+C\n")
 		shutdown()
-	
+
 if __name__ == '__main__': run()
