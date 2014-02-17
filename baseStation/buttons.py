@@ -37,7 +37,7 @@ def teleautoswitch(button):
 		button.setname('Teleop')
 		
 def screenshot(button):
-	pygame.image.save(ui.Widget.window, 'screenshots/{}.png'.format(int(time.time())))
+	pygame.image.save(ui.Widget.window, '{}.png'.format(int(time.time())))
 
 def mapreset(button):
 	ui.Widget.widgets['Map'].cleartrack()
