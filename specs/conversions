@@ -1,0 +1,11 @@
+PID Loop:
+Encoder ticks -> Hz; time-average 3-8 points.
+
+Convert Hz to speed
+x Hz * (0.273 m/s) / Hz = y m/s
+
+Feedback (what's k?)
+z m/s = desired m/s - k* y m/s
+
+#Convert to PWMA duty cycle (0..255) -> voltage -> speed
+Servo = (z m/s * 64/15 + 128) ?/(m/s)
