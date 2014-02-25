@@ -30,25 +30,10 @@ def parse():
     return (accel, gyro, magne)
     
 def talker():
-	
 	pub = rospy.Publisher('chatter', std_msgs.msg.String)
 	rospy.init_node('talker')
 	while not rospy.is_shutdown():
+        parse()
 		pub.publish('polo')
-		        
-    #import std_msgs.msg,geometry_msgs.msg
-    #msg = sensor_msgs.msg.IMU()
 
-def main():
-    accel = []
-    gyro = []
-    magnet = []
-    while True:
-        try:
-            accel, gyro, magnet =  parse()
-            talker()           
-        except: continue
-        
-
-
-main()
+talker()
