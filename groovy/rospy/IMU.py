@@ -3,12 +3,15 @@
 #Helen with Ben's help
 #Goal: read data from the accelerometer and give it to ROS
 import serial,math,rospy,std_msgs.msg
+from sensor_msgs.msg import Imu
+from geometry_msgs.msg import Vector3, Quaternion
 #ser = serial.Serial('/dev/ttyUSB0', 57600, timeout=0.1)
 
 def parse():
  
     #raw = ser.readline()
 
+	#Use if IMU is not plugged in, but you want to test the code
     raw = "$11,22,33,44,55,66,77,88,99\r\n"
 
     IMUraw = raw	#define the IMU raw data (from serial or sample)
@@ -30,10 +33,34 @@ def parse():
     return (accel, gyro, magne)
     
 def talker():
-	pub = rospy.Publisher('chatter', std_msgs.msg.String)
+	pub = rospy.Publisher('IMU', Imu)
 	rospy.init_node('talker')
+
 	while not rospy.is_shutdown():
-        parse()
-		pub.publish('polo')
+		(accel,gyro,magne) = parse()
+		
+		IMUmsg = Imu()
+		
+		IMUmsg.header.stamp = rospy.Time.now()
+		
+		IMUmsg.orientation = Quaternion()
+		IMUmsg.orientation.x = magne[0]
+		IMUmsg.orientation.y = magne[1]
+		IMUmsg.orientation.z = magne[2]
+		IMUmsg.orientation_covariance = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+		
+		IMUmsg.angular_velocity = Vector3()
+		IMUmsg.angular_velocity.x = gyro[0]
+		IMUmsg.angular_velocity.y = gyro[1]
+		IMUmsg.angular_velocity.y = gyro[2]
+		IMUmsg.angular_velocity_covariance = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+		
+		IMUmsg.linear_acceleration = Vector3()
+		IMUmsg.linear_acceleration.x = accel[0]
+		IMUmsg.linear_acceleration.y = accel[1]
+		IMUmsg.linear_acceleration.z = accel[2]
+		IMUmsg.linear_acceleration_covariance = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+		
+		pub.publish(IMUmsg)
 
 talker()
