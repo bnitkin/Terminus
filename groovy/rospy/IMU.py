@@ -5,6 +5,7 @@
 import serial,math,rospy,std_msgs.msg
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Vector3, Quaternion
+#Uncomment line below when IMU is plugged in
 #ser = serial.Serial('/dev/ttyUSB0', 57600, timeout=0.1)
 
 def parse():
@@ -33,34 +34,43 @@ def parse():
     return (accel, gyro, magne)
     
 def talker():
+	#Create publisher ('Topic name', msg type)
 	pub = rospy.Publisher('IMU', Imu)
+	#Tells rospy name of the node to allow communication to ROS master
 	rospy.init_node('talker')
 
 	while not rospy.is_shutdown():
+		#Grab relevant information from parse()
 		(accel,gyro,magne) = parse()
 		
+		#Define IMUmsg to be of the Imu msg type
 		IMUmsg = Imu()
 		
+		#Set header time stamp
 		IMUmsg.header.stamp = rospy.Time.now()
 		
+		#Set orientation parameters
 		IMUmsg.orientation = Quaternion()
 		IMUmsg.orientation.x = magne[0]
 		IMUmsg.orientation.y = magne[1]
 		IMUmsg.orientation.z = magne[2]
 		IMUmsg.orientation_covariance = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 		
+		#Set angular velocity parameters
 		IMUmsg.angular_velocity = Vector3()
 		IMUmsg.angular_velocity.x = gyro[0]
 		IMUmsg.angular_velocity.y = gyro[1]
 		IMUmsg.angular_velocity.z = gyro[2]
 		IMUmsg.angular_velocity_covariance = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 		
+		#Set linear acceleration parameters
 		IMUmsg.linear_acceleration = Vector3()
 		IMUmsg.linear_acceleration.x = accel[0]
 		IMUmsg.linear_acceleration.y = accel[1]
 		IMUmsg.linear_acceleration.z = accel[2]
 		IMUmsg.linear_acceleration_covariance = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 		
+		#Publish the data
 		pub.publish(IMUmsg)
 
 talker()
