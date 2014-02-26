@@ -52,7 +52,7 @@ def talker():
 		IMUmsg.angular_velocity = Vector3()
 		IMUmsg.angular_velocity.x = gyro[0]
 		IMUmsg.angular_velocity.y = gyro[1]
-		IMUmsg.angular_velocity.y = gyro[2]
+		IMUmsg.angular_velocity.z = gyro[2]
 		IMUmsg.angular_velocity_covariance = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 		
 		IMUmsg.linear_acceleration = Vector3()
