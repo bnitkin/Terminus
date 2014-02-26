@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #Python Code to talk to the GPS
 #Goal: read data from the GPS and give it to ROS
-import serial,math #rospy,std_msgs.msg
+import serial,math #,rospy,std_msgs.msg
+#from sensor_msgs.msg import NavSatFix,NavSatStatus
 #ser = serial.Serial('/dev/tty.usbserial-A603AXN7', 9600, timeout=0.1)
 ser = open('/home/robot/Terminus/groovy/rospy/gps.txt', 'r')
 
@@ -50,28 +51,28 @@ def parse():
 #Talker is to get it into ROS
 def talker():
 	
-	pub = rospy.Publisher('chatter', std_msgs.msg.String)
+	pub = rospy.Publisher('GPS', NavSatFix)
 	rospy.init_node('talker')
 	while not rospy.is_shutdown():
-		pub.publish('polo')
+		#Assuming that parse will return these values
+		(lat,lon,alt) = parse()
+		msg = NavSatFix()
+		msg.header.stamp = rospy.Time.now()
+		msg.latitude = lat
+		msg.longitude = lon
+		msg.altitude = alt
+		msg.position_covariance = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+		msg.position_covariance_type = 0
+		#covariance_type = 0 unknown
+		#                = 1 approximated
+		#                = 2 diagonal known
+		#                = 3 known
+		pub.publish(msg)
 				
 	#import std_msgs.msg,geometry_msgs.msg
 	#msg = sensor_msgs.msg.IMU()
-
-def main():
-	accel = []
-	gyro = []
-	magnet = []
-	while True:
-		try:
-			accel, gyro, magnet =  parse()
-			talker()		   
-		except: continue
-		
-
-
-main()
 """
+
 
 while True: parse()
 
