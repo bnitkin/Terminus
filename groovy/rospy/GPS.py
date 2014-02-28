@@ -2,8 +2,9 @@
 #Python Code to talk to the GPS
 #Goal: read data from the GPS and give it to ROS
 import serial,math #,rospy,std_msgs.msg
-#from sensor_msgs.msg import NavSatFix,NavSatStatus
-#ser = serial.Serial('/dev/tty.usbserial-A603AXN7', 9600, timeout=0.1)
+"""#from sensor_msgs.msg import NavSatFix,NavSatStatus
+ser = serial.Serial('/dev/tty.usbserial-A603AXN7', 9600, timeout=0.1)"""
+
 ser = open('/home/robot/Terminus/groovy/rospy/gps.txt', 'r')
 
 def GPGGA(GPSFixRaw):
@@ -28,14 +29,42 @@ def GPGGA(GPSFixRaw):
 	if GPSFixList[5] == 'W':
 		LongitudeDirection = -1
 	Longitude = (LongitudeDegrees + LongitudeMinutes/60)*LongitudeDirection
-	print GPSFixList, '\n',Latitude,Longitude
+    #Satillites Used
+    SatUsed = float(GPSFixList[7])
+    #Altitude
+    Altitude = int(GPSFixList[9])
+	print GPSFixList, '\n', Latitude, Longitude, Altitude, '\n'
+    return Latitude, Longitude, Altitude
+
 def GPGLL(string):
-	print 'and GLL'
+	print 'and Geographic Position (Lat&Long)'
+    return
+
+def GPGSA(string):
+	print 'and Active Satellites'
+    return
+
+def GPGSV(string):
+	print 'and Satellites in view'
+    return
+
+def GPRMC(string):
+	print 'and Recommended Minimum Specific Data'
+    return
+
+def GPVTG(string):
+	print 'and Course Over Ground and Ground Speed'
+    return
+
+
 
 parsetype = {}
-parsetype['$GPGGA'] = GPGGA
-parsetype['$GPGLL'] = GPGLL
-
+parsetype['$GPGGA'] = GPGGA #Global Positioning System Fix Data (time, position, #sat)
+parsetype['$GPGLL'] = GPGLL #Geographic Position (Lat&Long)
+parsetype['$GPGSA'] = GPGSA #Active Satellites
+parsetype['$GPGSV'] = GPGLL #Satellites in view
+parsetype['$GPRMC'] = GPRMC #Recommended Minimum Specific Data
+parsetype['$GPVTG'] = GPVTG #Course Over Ground and Ground Speed
 
 
 
@@ -47,7 +76,7 @@ def parse():
 	if GPSraw[:6] in parsetype:
 		parsetype[GPSraw[:6]](GPSraw)
 
-"""
+
 #Talker is to get it into ROS
 def talker():
 	
@@ -71,7 +100,7 @@ def talker():
 				
 	#import std_msgs.msg,geometry_msgs.msg
 	#msg = sensor_msgs.msg.IMU()
-"""
+
 
 
 while True: parse()
