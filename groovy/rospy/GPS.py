@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 #Python Code to talk to the GPS
 #Goal: read data from the GPS and give it to ROS
-import serial,math #,rospy,std_msgs.msg
-"""#from sensor_msgs.msg import NavSatFix,NavSatStatus
-ser = serial.Serial('/dev/tty.usbserial-A603AXN7', 9600, timeout=0.1)"""
+import serial,math,rospy,std_msgs.msg
+from sensor_msgs.msg import NavSatFix,NavSatStatus
+"""from sensor_msgs.msg import NavSatFix,NavSatStatus
+ser = serial.Serial('/dev/ttyUSB1', 9600, timeout=0.1)"""
 
-ser = open('/home/robot/Terminus/groovy/rospy/gps.txt', 'r')
+ser = open('/home/optimus/Terminus/groovy/rospy/gps.txt', 'r')
 
 def GPGGA(GPSFixRaw):
 	print 'We have fix data. Better learn to parse this... Let\'s try this...'
@@ -30,31 +31,31 @@ def GPGGA(GPSFixRaw):
 		LongitudeDirection = -1
 	Longitude = (LongitudeDegrees + LongitudeMinutes/60)*LongitudeDirection
     #Satillites Used
-    SatUsed = float(GPSFixList[7])
+    #SatUsed = float(GPSFixList[7])
     #Altitude
-    Altitude = int(GPSFixList[9])
+	Altitude = GPSFixList[9]
 	print GPSFixList, '\n', Latitude, Longitude, Altitude, '\n'
-    return Latitude, Longitude, Altitude
+	return Latitude, Longitude, Altitude
 
 def GPGLL(string):
 	print 'and Geographic Position (Lat&Long)'
-    return
+	return
 
 def GPGSA(string):
 	print 'and Active Satellites'
-    return
+	return
 
 def GPGSV(string):
 	print 'and Satellites in view'
-    return
+	return
 
 def GPRMC(string):
 	print 'and Recommended Minimum Specific Data'
-    return
+	return
 
 def GPVTG(string):
 	print 'and Course Over Ground and Ground Speed'
-    return
+	return
 
 
 
@@ -74,8 +75,8 @@ def parse():
 		#if GPSraw != '':
 		#print GPSraw
 	if GPSraw[:6] in parsetype:
-		parsetype[GPSraw[:6]](GPSraw)
-
+		(lat,lon,alt) = parsetype[GPSraw[:6]](GPSraw)
+		return lat,lon,alt
 
 #Talker is to get it into ROS
 def talker():
@@ -84,7 +85,10 @@ def talker():
 	rospy.init_node('talker')
 	while not rospy.is_shutdown():
 		#Assuming that parse will return these values
-		(lat,lon,alt) = parse()
+		try:
+			(lat,lon,alt) = parse()
+		except:
+			continue
 		msg = NavSatFix()
 		msg.header.stamp = rospy.Time.now()
 		msg.latitude = lat
@@ -98,10 +102,6 @@ def talker():
 		#                = 3 known
 		pub.publish(msg)
 				
-	#import std_msgs.msg,geometry_msgs.msg
-	#msg = sensor_msgs.msg.IMU()
 
 
-
-while True: parse()
-
+talker()
