@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 #Python Code to talk to the GPS
 #Goal: read data from the GPS and give it to ROS
-import serial,math,rospy,std_msgs.msg
+import serial,time,math,rospy,std_msgs.msg
 from sensor_msgs.msg import NavSatFix,NavSatStatus
-"""from sensor_msgs.msg import NavSatFix,NavSatStatus
-ser = serial.Serial('/dev/ttyUSB1', 9600, timeout=0.1)"""
 
-ser = open('/home/optimus/Terminus/groovy/rospy/gps.txt', 'r')
+ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=0.1)
+
+#global ser
+#ser = open('/home/optimus/Terminus/groovy/rospy/gps.txt', 'r')
 
 def GPGGA(GPSFixRaw):
 	print 'We have fix data. Better learn to parse this... Let\'s try this...'
@@ -33,8 +34,9 @@ def GPGGA(GPSFixRaw):
     #Satillites Used
     #SatUsed = float(GPSFixList[7])
     #Altitude
-	Altitude = GPSFixList[9]
+	Altitude = float(GPSFixList[9])
 	print GPSFixList, '\n', Latitude, Longitude, Altitude, '\n'
+	print 'Lat: ',Latitude,' Lon: ', Longitude,' Alt: ', Altitude
 	return Latitude, Longitude, Altitude
 
 def GPGLL(string):
@@ -72,21 +74,28 @@ parsetype['$GPVTG'] = GPVTG #Course Over Ground and Ground Speed
 
 def parse():
 	GPSraw = ser.readline()	#define the GPS raw data (from serial or sample)
+	print GPSraw,'<- got it'
 		#if GPSraw != '':
 		#print GPSraw
-	if GPSraw[:6] in parsetype:
-		(lat,lon,alt) = parsetype[GPSraw[:6]](GPSraw)
+	#if GPSraw[:6] in parsetype:
+	if GPSraw[:6] == '$GPGGA':
+		(lat,lon,alt) = GPGGA(GPSraw)
+		#(lat,lon,alt) = parsetype[GPSraw[:6]](GPSraw)
 		return lat,lon,alt
+	else:
+		print 'NOT GPGGA'
 
 #Talker is to get it into ROS
 def talker():
-	
+	print 'in talker'
 	pub = rospy.Publisher('GPS', NavSatFix)
 	rospy.init_node('talker')
 	while not rospy.is_shutdown():
 		#Assuming that parse will return these values
 		try:
 			(lat,lon,alt) = parse()
+			print type(lat), type(lon), type(alt)
+			
 		except:
 			continue
 		msg = NavSatFix()
@@ -101,7 +110,5 @@ def talker():
 		#                = 2 diagonal known
 		#                = 3 known
 		pub.publish(msg)
-				
-
 
 talker()
