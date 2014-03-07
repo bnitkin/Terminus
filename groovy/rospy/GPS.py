@@ -5,8 +5,6 @@ import serial,time,math,rospy,std_msgs.msg
 from sensor_msgs.msg import NavSatFix,NavSatStatus
 
 ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=0.1)
-
-#global ser
 #ser = open('/home/optimus/Terminus/groovy/rospy/gps.txt', 'r')
 
 def GPGGA(GPSFixRaw):
@@ -35,42 +33,14 @@ def GPGGA(GPSFixRaw):
     #SatUsed = float(GPSFixList[7])
     #Altitude
 	Altitude = float(GPSFixList[9])
+	
+	#Parsing Mode
+	ModeRaw = GPSFixList[6]
+	Mode = int(ModeRaw)
+	
 	print GPSFixList, '\n', Latitude, Longitude, Altitude, '\n'
 	print 'Lat: ',Latitude,' Lon: ', Longitude,' Alt: ', Altitude
-	return Latitude, Longitude, Altitude
-
-def GPGLL(string):
-	print 'and Geographic Position (Lat&Long)'
-	return
-
-def GPGSA(string):
-	print 'and Active Satellites'
-	return
-
-def GPGSV(string):
-	print 'and Satellites in view'
-	return
-
-def GPRMC(string):
-	print 'and Recommended Minimum Specific Data'
-	return
-
-def GPVTG(string):
-	print 'and Course Over Ground and Ground Speed'
-	return
-
-
-
-parsetype = {}
-parsetype['$GPGGA'] = GPGGA #Global Positioning System Fix Data (time, position, #sat)
-parsetype['$GPGLL'] = GPGLL #Geographic Position (Lat&Long)
-parsetype['$GPGSA'] = GPGSA #Active Satellites
-parsetype['$GPGSV'] = GPGLL #Satellites in view
-parsetype['$GPRMC'] = GPRMC #Recommended Minimum Specific Data
-parsetype['$GPVTG'] = GPVTG #Course Over Ground and Ground Speed
-
-
-
+	return Latitude, Longitude, Altitude, Mode
 
 def parse():
 	GPSraw = ser.readline()	#define the GPS raw data (from serial or sample)
@@ -79,9 +49,9 @@ def parse():
 		#print GPSraw
 	#if GPSraw[:6] in parsetype:
 	if GPSraw[:6] == '$GPGGA':
-		(lat,lon,alt) = GPGGA(GPSraw)
+		(lat,lon,alt,mode) = GPGGA(GPSraw)
 		#(lat,lon,alt) = parsetype[GPSraw[:6]](GPSraw)
-		return lat,lon,alt
+		return lat,lon,alt,mode
 	else:
 		print 'NOT GPGGA'
 
@@ -93,13 +63,19 @@ def talker():
 	while not rospy.is_shutdown():
 		#Assuming that parse will return these values
 		try:
-			(lat,lon,alt) = parse()
+			(lat,lon,alt,mode) = parse()
+			time.sleep(0.1)
 			print type(lat), type(lon), type(alt)
 			
 		except:
 			continue
 		msg = NavSatFix()
+		Fix = NavSatStatus()
+		Fix.status = mode
+		Fix.service = 1
+		
 		msg.header.stamp = rospy.Time.now()
+		msg.status = Fix
 		msg.latitude = lat
 		msg.longitude = lon
 		msg.altitude = alt
