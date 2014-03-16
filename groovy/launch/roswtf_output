@@ -1,0 +1,64 @@
+o package or stack in context
+================================================================================
+Static checks summary:
+
+Found 2 warning(s).
+Warnings are things that may be just fine, but are sometimes at fault
+
+WARNING You are missing core ROS Python modules: rosinstall -- bloom -- rosrelease -- 
+WARNING You are missing Debian packages for core ROS Python modules: rosinstall (python-rosinstall) -- bloom (python-bloom) -- rosrelease (python-rosrelease) -- 
+
+================================================================================
+
+ROS Master does not appear to be running.
+Online graph checks will not be run.
+ROS_MASTER_URI is [http://localhost:11311]
+machira@machira-K53SV:~/Documents/School/SeniorDesign2014/code/groovy/launch$ roswtf 
+No package or stack in context
+================================================================================
+Static checks summary:
+
+Found 2 warning(s).
+Warnings are things that may be just fine, but are sometimes at fault
+
+WARNING You are missing core ROS Python modules: rosinstall -- bloom -- rosrelease -- 
+WARNING You are missing Debian packages for core ROS Python modules: rosinstall (python-rosinstall) -- bloom (python-bloom) -- rosrelease (python-rosrelease) -- 
+
+================================================================================
+Beginning tests of your ROS graph. These may take awhile...
+analyzing graph...
+... done analyzing graph
+running graph rules...
+ERROR: connection refused to [http://machira-K53SV:37455/]
+... done running graph rules
+
+Online checks summary:
+
+Found 1 warning(s).
+Warnings are things that may be just fine, but are sometimes at fault
+
+WARNING These nodes have died:
+ * cameras/elas_pc-7
+
+
+Found 3 error(s).
+
+ERROR Could not contact the following nodes:
+ * /cameras/elas_pc
+
+ERROR The following nodes should be connected but aren't:
+ * /cameras/visualodometry->/cameras/elas_pc (/cameras/visualodometry/pose)
+ * /cameras/visualodometry->/cameras/elas_pc (/cameras/tf)
+ * /cameras/elas->/cameras/elas_pc (/cameras/elas/frame_data)
+
+ERROR Errors connecting to the following services:
+ * service [/cameras/elas_pc/tf_frames] appears to be malfunctioning: Unable to communicate with service [/cameras/elas_pc/tf_frames], address [rosrpc://machira-K53SV:49134]
+ * service [/cameras/elas_pc/set_logger_level] appears to be malfunctioning: Unable to communicate with service [/cameras/elas_pc/set_logger_level], address [rosrpc://machira-K53SV:49134]
+ * service [/cameras/elas_pc/get_loggers] appears to be malfunctioning: Unable to communicate with service [/cameras/elas_pc/get_loggers], address [rosrpc://machira-K53SV:49134]
+
+Exception in thread Thread-12 (most likely raised during interpreter shutdown):
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/threading.py", line 551, in __bootstrap_inner
+  File "/usr/lib/python2.7/threading.py", line 504, in run
+  File "/opt/ros/groovy/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 154, in run
+<type 'exceptions.AttributeError'>: 'NoneType' object has no attribute 'timeout'

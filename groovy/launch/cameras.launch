@@ -2,18 +2,21 @@
 	<!--*_cam_path: the location of the camera devices. 
 		Use a path that won't change with reboot.
 		See /etc/udev/rules.d/30-pscam.rules -->
-	<arg name="left_cam_path"  value="/dev/video-left"/>
-	<arg name="right_cam_path" value="/dev/video-right"/>
-
+	<arg name="left_cam_path"  value="/dev/video1"/>
+	<arg name="right_cam_path" value="/dev/video2"/>
+	<arg name= "left_cam_info"  value="file:///home/machira/Documents/School/SeniorDesign2014/code/groovy/etc/calLeft.yml"/>
+	<arg name= "right_cam_info"  value="file:///home/machira/Documents/School/SeniorDesign2014/code/groovy/etc/calRight.yml"/>
+	<arg name="frame_data" value ="file:///home/machira/Documents/School/SeniorDesign2014/code/groovy/etc/ElasFrameData.msg"/>
 	<!--Camera drivers-->
-	<node name="cameras" pkg="uvc_camera" type="stereo_node" output="screen">
+	<node name="cameras" pkg="uvc_camera" type="uvc_stereo_node" output="screen">
 		<param name="left/device" value="$(arg left_cam_path)" />
 		<param name="right/device" value="$(arg right_cam_path)" />	
-		<param name="left/camera_info_url"  value="file:///home/optimus/Terminus/groovy/etc/calLeft.yml" />
-		<param name="right/camera_info_url" value="file:///home/optimus/Terminus/groovy/etc/calRight.yml" />
+		<param name="left/camera_info_url"  value="$(arg left_cam_info)" />
+		<param name="right/camera_info_url" value="$(arg right_cam_info)" />
 		<param name="width" value="640" />
 		<param name="height" value="480" />
 		<param name="fps" value="30" />
+		<param name="frame_id" value="/cameras"/>
 	</node>
 	
 	<!--Stereo processing-->
@@ -23,15 +26,31 @@
 		<param name="approximate_sync" value="false"/>
 	</node>
 	
-	<!--Odometry-->
+	<!--Odometry
 	<remap from="/tf" to="tf"/>
-	<node name="visualodometry" pkg="viso2_ros" type="stereo_odometer" args="stereo:=/cameras image:=image_rect"/>
+	<node name="visualodometry" pkg="viso2_ros" type="stereo_odometer" args="stereo:=/cameras image:=image_rect"/>-->
 
 	<!--Disparity viewer-->
 	<remap from="left/image_rect_color" to="left/cameras/image_rect_color"/>
 	<remap from="right/image_rect_color" to="right/cameras/image_rect_color"/>
 	<node name="viewers" pkg="image_view" type="stereo_view" args="stereo:=/cameras image:=image_rect">
 		<param name="autosize" value="false"/>
-	</node>	
-
+	</node>
+	
+	<!--Elas-->
+	<node pkg="viso2_ros" type="stereo_odometer" name="visualodometry" 
+      args="stereo:=/cameras image:=image_rect"  >
+    	<param name="approximate_sync" value="false" />
+    	<param name="sensor_frame_id" value="/cameras"/>
+    	<param name="odom_frame_id" value="/odom"/>
+    	<param name="base_link_frame_id" value="/base_link"/>
+    	<param name="publish_tf" value="true"/>
+  	</node>
+  	<remap from = "/visualodometry" to="visualodometry"/>
+  	<node pkg="elas_ros" type="elas_ros" name="elas" args="stereo:=/cameras image:=image_rect" respawn="true">
+	    <param name="approximate_sync" value="false" />
+  	</node>
+  	<remap from = "/visualodometry" to="visualodometry"/>
+  	<node pkg="elas_ros" type="pc_construction" name="elas_pc"
+	   args="frame_data:=elas/frame_data pose:=/cameras/visualodometry/pose base_frame_id:=/odom pose_frame_id:=/base_link" />
 </launch>
