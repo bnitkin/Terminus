@@ -1,8 +1,9 @@
 <launch>
 <!--main.launch handles launching individual launchfiles.-->
-	<include file="/home/optimus/groovy/launch/cameras.launch" ns="cameras"/>
-	<include file="/home/optimus/groovy/launch/navigation.launch" ns="navigation"/>
-	<include file="/home/optimus/groovy/launch/tf.launch"/>
+	
+	<include file="/home/machira/Documents/School/SeniorDesign2014/code/groovy/launch/cameras.launch" ns="cameras"/>
+	<include file="/home/machira/Documents/School/SeniorDesign2014/code/groovy/launch/navigation.launch" ns="navigation"/>
+	<include file="/home/machira/Documents/School/SeniorDesign2014/code/groovy/launch/tf.launch"/>
 
 	<!--On the fly parameter adjustment. Feel free to comment out.-->
 	<!--<node name="config" pkg="rqt_reconfigure" type="rqt_reconfigure"/>-->
