@@ -1,0 +1,23 @@
+The Arduino needs to:
+-Communicate with:
+	-Tach (2 digital)
+	-speed controls (tbd)
+	-laptop (usb)
+	-rangefinders (3 analog)
+	-safety light (1 analog)
+
+-Rangefinders:
+	-Arduino will comminicate over an analog signal
+	-Voltage varies with distance
+-Speed controls
+	-Research speed controls
+-Laptop
+	-Talk to Ben about communication protocol
+-Safety light
+	-Send 
+-Tach
+	-Read voltage from tach
+	-Report it to laptop (when requested?)
+
+
+Multiple arduino's needed?
