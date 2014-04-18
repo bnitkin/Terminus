@@ -3,13 +3,7 @@
 #include <Servo.h>
 #include <Encoder.h>
 
-//Pinout constants
-static int reedL0 = 10;
-static int reedL1 = 11;
-static int reedR0 = 12;
-static int reedR1 = 13;
-
-static int leftMotor = 6;
+static int leftMotor = 6; //Motor constants
 static int rightMotor = 7;
 
 //Other constants

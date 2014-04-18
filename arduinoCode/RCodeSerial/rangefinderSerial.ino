@@ -1,6 +1,4 @@
-static int leftRangePin =  0;     // ***Check correct pin numbers***
-static int centerRangePin= 1;
-static int rightRangePin = 2;
+
 static float rangeConstant = 0.01278;   // *** (3.3V/1024) / (6.4mV/in) * 0.0254 in/m
                
 int rangeL = 0;           // variables to store rangefinder voltages
