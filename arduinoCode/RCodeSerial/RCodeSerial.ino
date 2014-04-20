@@ -1,29 +1,20 @@
 
+/*
+float speedTotal= 0;
+float turnRate  = 0;
+float speedLeft = 0;
+float speedRight= 0;
 
-float speedTotal
-float turnRate
-float speedLeft
-float speedRight
-
-//Encoder Pins
-static int reedL0 = 10;
-static int reedL1 = 11;
-static int reedR0 = 12;
-static int reedR1 = 13;
-
-//Rangefinder Pins
-static int leftRangePin =  0;     // ***Check correct pin numbers***
-static int centerRangePin= 1;
-static int rightRangePin = 2;
+*/
 
 
 void setup()
 {
   Serial.begin(9600);
-  rightmotor.attach(rightMotor);
+ /* rightmotor.attach(rightMotor);
   leftmotor.attach(leftMotor);
   leftmotorPID.SetMode(AUTOMATIC);
-  rightmotorPID.SetMode(AUTOMATIC);
+  rightmotorPID.SetMode(AUTOMATIC); */
 }
 
 void loop()
@@ -31,7 +22,7 @@ void loop()
   //READ SERIAL
   // if there's any serial available, read a line into a string "command"
   // Parse it for three lines, the typical set expected from the computer
-  if(Serial.available() > 0) {
+  /*if(Serial.available() > 0) {
     String command = Serial.readStringUntil('\n');
     if(command.substring(0,2) = "R34") {
       //  "R34 1.2 0.3" to speedOverall = 1.2m/s and turnrate = 0.3rad/s
@@ -46,10 +37,10 @@ void loop()
       //  "R36 2.35" to speedRight = 2.35m/s
       speedRight = float(command.substring(4,command.length());
     }
-  }
+  } */
     //Call functions in tabs, which are our modules for the encoder and the rangefinders.
     rangeloop();
-    encoderloop();
+
     
     
   }
