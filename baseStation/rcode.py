@@ -36,7 +36,7 @@ def setState():
 	if serclock.get_fps() < 8: state = 2
 	if serclock.get_fps() < 2: state = 1
 	
-	serial.write('R08 {}\n'.format(state)) #Retransmit state every 1/30 of a second.
+	serial.write('R08 {}\r\n'.format(state)) #Retransmit state every 1/30 of a second.
 	#Update gauges to reflect new state iff it's changed.
 	global laststate
 

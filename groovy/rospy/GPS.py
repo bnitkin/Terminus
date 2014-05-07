@@ -4,8 +4,19 @@
 import serial,time,math,rospy,std_msgs.msg
 from sensor_msgs.msg import NavSatFix,NavSatStatus
 
-ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=0.1)
-#ser = open('/home/optimus/Terminus/groovy/rospy/gps.txt', 'r')
+#ser = serial.Serial('/dev/ttyUSB1', 9600, timeout=0.1)
+ser = open('/home/optimus/Terminus/groovy/rospy/gps.txt', 'r')
+
+class GPS():
+	def __init__(self):
+		self.lat = 0
+		self.lon = 0
+		self.alt = 0
+		self.mode = 0
+		self.head = 0
+		self.numSat = 0
+	
+GPS = GPS()
 
 def GPGGA(GPSFixRaw):
 	print 'We have fix data. Better learn to parse this... Let\'s try this...'
@@ -30,7 +41,7 @@ def GPGGA(GPSFixRaw):
 		LongitudeDirection = -1
 	Longitude = (LongitudeDegrees + LongitudeMinutes/60)*LongitudeDirection
     #Satillites Used
-    #SatUsed = float(GPSFixList[7])
+    GPS.numSat = float(GPSFixList[7])
     #Altitude
 	Altitude = float(GPSFixList[9])
 	
@@ -42,6 +53,13 @@ def GPGGA(GPSFixRaw):
 	print 'Lat: ',Latitude,' Lon: ', Longitude,' Alt: ', Altitude
 	return Latitude, Longitude, Altitude, Mode
 
+def GPVTG(GPSFixRaw):
+	GPSFixList = GPSFixRaw.strip('$GPVTG\n').split(',')
+	print GPSFixList[1]
+	head = float(GPSFixList[1])
+	return head
+	
+
 def parse():
 	GPSraw = ser.readline()	#define the GPS raw data (from serial or sample)
 	print GPSraw,'<- got it'
@@ -49,36 +67,33 @@ def parse():
 		#print GPSraw
 	#if GPSraw[:6] in parsetype:
 	if GPSraw[:6] == '$GPGGA':
-		(lat,lon,alt,mode) = GPGGA(GPSraw)
-		#(lat,lon,alt) = parsetype[GPSraw[:6]](GPSraw)
-		return lat,lon,alt,mode
+		(GPS.lat,GPS.lon,GPS.alt,GPS.mode) = GPGGA(GPSraw)
+		#(lat,lon,alt) = parsetype[GPSraw[:6]](GPSraw)	
+	#elif GPSraw[:6] == '$GPVTG':
+	#	GPS.head = GPVTG(GPSraw)
 	else:
-		print 'NOT GPGGA'
+		print 'NOT GPGGA or GPVTG'
 
 #Talker is to get it into ROS
 def talker():
+	
 	print 'in talker'
 	pub = rospy.Publisher('GPS', NavSatFix)
-	rospy.init_node('talker')
+	rospy.init_node('GPStalker')
 	while not rospy.is_shutdown():
 		#Assuming that parse will return these values
-		try:
-			(lat,lon,alt,mode) = parse()
-			time.sleep(0.1)
-			print type(lat), type(lon), type(alt)
-			
-		except:
-			continue
+		time.sleep(1)
+		parse()
 		msg = NavSatFix()
 		Fix = NavSatStatus()
-		Fix.status = mode
-		Fix.service = 1
+		Fix.status = GPS.mode
+		Fix.service = GPS.numSat
 		
 		msg.header.stamp = rospy.Time.now()
 		msg.status = Fix
-		msg.latitude = lat
-		msg.longitude = lon
-		msg.altitude = alt
+		msg.latitude = GPS.lat
+		msg.longitude = GPS.lon
+		msg.altitude = GPS.alt
 		msg.position_covariance = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 		msg.position_covariance_type = 0
 		#covariance_type = 0 unknown
@@ -87,4 +102,12 @@ def talker():
 		#                = 3 known
 		pub.publish(msg)
 
+def heading():
+	publ = rospy.Publisher('GPS/Heading', float)
+	rospy.init_node('heading')
+	while not rospy.is_shutdown():
+		msg = GPS.head
+		publ.publish(msg)
+
 talker()
+#heading()

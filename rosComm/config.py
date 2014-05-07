@@ -117,8 +117,8 @@ RANGE_MIN = 1 #Red closer than this (m)
 RANGE_MAX = 5 #Green further than this
 
 ##Serial settings
-BAUDRATE = 115200
-PORT = '/dev/ttyUSB0'
+BAUDRATE = 9600
+PORT = '/dev/ttyACM0'
 TIME_WRITE = 50 #ms; Maximum time to spend writing to serial per loop. (higher values fill read buffer)
 TIME_MIN = 70 #ms; Minimum time for a read/write serial loop (higher values reduce CPU)
 RATE_AVG = 20 #Number of samples to use for rate averaging.

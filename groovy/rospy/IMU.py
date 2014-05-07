@@ -6,14 +6,14 @@ import serial,math,rospy,std_msgs.msg
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Vector3, Quaternion
 #Uncomment line below when IMU is plugged in
-#ser = serial.Serial('/dev/ttyUSB0', 57600, timeout=0.1)
+ser = serial.Serial('/dev/ttyUSB2', 57600, timeout=0.1)
 
 def parse():
  
-    #raw = ser.readline()
+    raw = ser.readline()
 
 	#Use if IMU is not plugged in, but you want to test the code
-    raw = "$11,22,33,44,55,66,77,88,99\r\n"
+    #raw = "$11,22,33,44,55,66,77,88,99\r\n"
 
     IMUraw = raw	#define the IMU raw data (from serial or sample)
     IMUraw = IMUraw.strip('$#\r\n')	#remove line marking characters
@@ -30,18 +30,21 @@ def parse():
     accel = map(lambda x:x*.0039*9.8,accelraw)	#m/s^2, check over many values
     gyro = map(lambda x:x/14.375*3.14/180.0,gyroraw)	#radians per second
     magne = map(lambda x:x/(10000*230.0),magneraw)	#Tesla, needs reference to check
- #   print accel
+    print magne
     return (accel, gyro, magne)
     
 def talker():
 	#Create publisher ('Topic name', msg type)
 	pub = rospy.Publisher('IMU', Imu)
 	#Tells rospy name of the node to allow communication to ROS master
-	rospy.init_node('talker')
+	rospy.init_node('IMUtalker')
 
 	while not rospy.is_shutdown():
 		#Grab relevant information from parse()
-		(accel,gyro,magne) = parse()
+		try:
+			(accel,gyro,magne) = parse()
+		#If data is bad, uses presvious data
+		except: continue
 		
 		#Define IMUmsg to be of the Imu msg type
 		IMUmsg = Imu()

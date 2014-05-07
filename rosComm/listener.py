@@ -6,21 +6,34 @@
 
 import rospy
 from sensor_msgs.msg import Imu,NavSatFix,NavSatStatus
+from std_msgs.msg import Float64
 
+class Quat():
+	def __init__(self):
+		self.x=0
+		self.y=0
+		self.z=0
+		self.w=0
+		
 class listen():
 	"""All ROS subscribers save their callback data in this class"""	
 	def __init__(self):
 		print 'init'
-		self.IMUlisten()
-		self.GPSlisten()
+		#self.IMUlisten()
+		self.LEFTlisten()
+		#self.GPSlisten()
 		self.head = 99
-		self.left = 1
-		self.center = 2
-		self.right = 3
+		self.left = 0
+		self.center = 0
+		self.right = 0
 		self.lat = 147
 		self.lon = 109	
 		self.twist = 0.001
 		self.numSat = 0
+		self.accel = (0, 0, 0)
+		self.gyro = (0, 0, 0)
+		self.magne = Quat()
+		# Need to pull odometry twist from ROS when autonomous is running
 		
 	# Callback function for IMUlisten
 	def IMUinfo(self,data):
@@ -28,12 +41,11 @@ class listen():
 		self.gyro = data.angular_velocity
 		self.magne = data.orientation
 		
-					
 	# ROS subscriber to get IMU data
 	def IMUlisten(self):
-		#rospy.init_node('IMUlisten', anonymous = True)
+		rospy.init_node('IMUlisten', anonymous = True)
 		rospy.Subscriber('IMU',Imu,self.IMUinfo)
-
+		
 	# Callback function for GPSlisten
 	def GPSinfo(self,data):
 		self.lat = data.latitude
@@ -46,6 +58,16 @@ class listen():
 	def GPSlisten(self):
 		rospy.init_node('GPSlisten', anonymous = True)
 		rospy.Subscriber('GPS',NavSatFix,self.GPSinfo)
+		
+	# Callback function for left rangefinder data
+	def LEFTinfo(self,data):
+		self.left = data
+	
+	# ROS subscriber to get left range finder info
+	def LEFTlisten(self):
+		rospy.init_node('LEFTlisten', anonymous = True)
+		rospy.Subscriber('LeftRange',Float64,self.LEFTinfo)
+		
 		
 """
 	# Callback function for HEADlisten
@@ -70,3 +92,4 @@ class listen():
 		#Also, spin might not be necessary more than once
 		rospy.spin()
 """
+

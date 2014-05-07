@@ -32,24 +32,26 @@ class Serial(threading.Thread):
 	
 	alive = True
 	#If the serial device isn't accessable, throw a terminal warning but proceed.
-	try: 
+	#TODO Restore exception handling
+	try:
 		ser = serial.Serial(PORT, BAUDRATE, timeout = 0)
 	except:
 		sys.stderr.write("!! Serial device {} not accessable. Proceeding in demo mode.\n".format(PORT))
 		alive = False
+
 
 	def run(self):
 		"""Thread to manage the serial port. 
 		Retrieve all data that pyserial's buffered. 
 		Push all full lines into the local recieved buffer. Save any partial line in tmp.
 		Transmit all queued codes."""
-
+		print 'RUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\nRUN\n'
 		while self.alive:
 			self.recieve()
 			self.transmit()
 			#Limit framerate by TIME_MIN.
 			self.clock.tick(1000/TIME_MIN)
-
+		self.ser.close()
 		
 	def recieve(self):
 		#RX data from PySerial buffer		
@@ -78,15 +80,20 @@ class Serial(threading.Thread):
 		start = time.get_ticks()
 		while len(self.tx) and ((time.get_ticks() - start) < TIME_WRITE): #Transmit for no longer than timeout
 			#Keep statistics on transmission data rate.
+			print 'in loop'
 			self.txData.append(len(self.tx[0]))
 			self.txTime.append(time.get_ticks())
 		
 			print '#' + self.tx[0],
 			self.ser.write(self.tx.popleft())
-				
-		self.txRate = 1000 * sum(self.txData) / (self.txTime[-1]-self.txTime[0])
-		self.rxRate = 1000 * sum(self.rxData) / (self.rxTime[-1]-self.rxTime[0])
-	
+		try: 
+			self.txRate = 1000 * sum(self.txData) / (self.txTime[-1]-self.txTime[0])
+		except:
+			pass
+		try: 
+			self.rxRate = 1000 * sum(self.rxData) / (self.rxTime[-1]-self.rxTime[0])
+		except: 
+			pass
 	#Keep track of sending and recieving speeds, B/s
 	def txSpeed(self): return self.txRate
 	def rxSpeed(self): return self.rxRate
@@ -112,6 +119,7 @@ class Serial(threading.Thread):
 	def write(self, data):
 		"""Writes a string to the transmission buffer"""
 		self.tx.append(data)
+		print 'Writing: ', data, 'length: ', len(self.tx)
 			
 	def stop(self): 
 		"""Kills the thread."""
