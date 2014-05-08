@@ -31,6 +31,8 @@ def setState():
 	"""Transmits a robot set-state command based on incoming bandwidth."""
 	#Set state based on the number of hits/s Alive gets.
 	state = 5 #The code to send to transition to state 5
+	#Disabled for testing TODO
+	return
 	if serclock.get_fps() < 12: state = 4
 	if serclock.get_fps() < 10: state = 3
 	if serclock.get_fps() < 8: state = 2
