@@ -344,7 +344,8 @@ class Light(Widget):
 		"""Sets the current state of the Light. Can be True, False, or a float in the 0...1 range."""
 		if self.warn: self.clearwarn()
 		self.state = state
-		
+		self.clean = False
+
 	def draw(self):
 		self.clean = True
 		self.fill(BACKGROUND)
