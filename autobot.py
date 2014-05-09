@@ -6,37 +6,47 @@
 
 #ROS was a great idea, but we're out of time. Here goes nothing.
 
+import serial, time
+from math import atan2 as atan
+
 #Attachment order: XBEE, GPS, IMU, Arduino. 
 #This is important, since they enumerate in the order of plugging.
-serXBEE    = serial.Serial('/dev/ttyUSB1', 115200, timeout=0.1)
-serGPS     = serial.Serial('/dev/ttyUSB1', 9600, timeout=0.1)
-serIMU     = serial.Serial('/dev/ttyUSB2', 57600, timeout=0.1)
-serArduino = serial.Serial('/dev/ttyUSB3', 9600, timeout=0.1)
+try:	serXBEE	= serial.Serial('/dev/ttyUSB0', 115200, timeout=0.1)
+except:	print "Could not open XBEE on /dev/ttyUSB0"
+
+try:	serGPS	= serial.Serial('/dev/ttyUSB1', 9600, timeout=0.1)
+except:	print "Could not open GPS on /dev/ttyUSB1"
+
+try:	serIMU	= serial.Serial('/dev/ttyUSB2', 57600, timeout=1)
+except:	print "Could not open XBee on /dev/ttyUSB2"
+
+try:	serArduino	= serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+except:	print "Could not open Arduino on /dev/ttyUSB3"
 
 def parseIMU():
- 
-    raw = serIMU.readline()
+	lines = serIMU.read(serIMU.inWaiting()).splitlines()
+	IMUraw = "not valid data"
+	for line in lines:
+		if "#" in line: IMUraw = line
+		
+	IMUraw = IMUraw.strip('$#\r\n')	#remove line marking characters
+	IMUlist = IMUraw.split(',')	#split into a list at commas
 
-    IMUraw = raw	#define the IMU raw data (from serial or sample)
-    IMUraw = IMUraw.strip('$#\r\n')	#remove line marking characters
-    IMUlist = IMUraw.split(',')	#split into a list at commas
+	IMUlist = map(int,IMUlist)
+	accelraw = IMUlist[0:3]	#list
+	gyroraw = IMUlist[3:6]
+	magneraw = IMUlist[6:9]
+	
+	#testaccelraw = map(String,accelraw)
 
-    IMUlist = map(int,IMUlist)
-    accelraw = IMUlist[0:3]	#list
-    gyroraw = IMUlist[3:6]
-    magneraw = IMUlist[6:9]
-    
-    #testaccelraw = map(String,accelraw)
-
-    #Into metric
-    accel = map(lambda x:x*.0039*9.8,accelraw)	#m/s^2, check over many values
-    gyro = map(lambda x:x/14.375*3.14/180.0,gyroraw)	#radians per second
-    magne = map(lambda x:x/(10000*230.0),magneraw)	#Tesla, needs reference to check
-    return (accel, gyro, magne)
+	#Into metric
+	accel = map(lambda x:x*.0039*9.8,accelraw)	#m/s^2, check over many values
+	gyro = map(lambda x:x/14.375*3.14/180.0,gyroraw)	#radians per second
+	magne = map(lambda x:x/(10000*230.0),magneraw)	#Tesla, needs reference to check
+	return (accel, gyro, magne)
 
 
 def GPGGA(GPSFixRaw):
-	print 'We have fix data. Better learn to parse this... Let\'s try this...'
 	GPSFixList = GPSFixRaw.strip('$GPGGA\n').split(',')
 	#Parsing Latitude
 	LatitudeRaw = GPSFixList[2]
@@ -49,6 +59,7 @@ def GPGGA(GPSFixRaw):
 	Latitude = (LatitudeDegrees + LatitudeMinutes/60)*LatitudeDirection	#In decimal degrees
 	
 	#Parsing Longitude
+	#Parsing Longitude
 	LongitudeRaw = GPSFixList[4]
 	LongitudeDegrees = int(LongitudeRaw[:3])
 	LongitudeMinutes = float(LongitudeRaw[3:])
@@ -57,9 +68,9 @@ def GPGGA(GPSFixRaw):
 	if GPSFixList[5] == 'W':
 		LongitudeDirection = -1
 	Longitude = (LongitudeDegrees + LongitudeMinutes/60)*LongitudeDirection
-    #Satillites Used
-    SatUsed = float(GPSFixList[7])
-    #Altitude
+	#Satillites Used
+	SatUsed = float(GPSFixList[7])
+	#Altitude
 	Altitude = float(GPSFixList[9])
 	
 	#Parsing Mode
@@ -67,30 +78,51 @@ def GPGGA(GPSFixRaw):
 	Mode = int(ModeRaw)
 	
 	print GPSFixList, '\n', Latitude, Longitude, Altitude, '\n'
-	print 'Lat: ',Latitude,' Lon: ', Longitude,' Alt: ', Altitude
+	print 'Lat: ',Latitude,' Lon: ', Longitude,' Alt: ', Altitude, "Mode", Mode, "Number", SatUsed
 	return Latitude, Longitude, Altitude, Mode, SatUsed
 
 def parseGPS():
-	GPSraw = serGPS.readline()	#define the GPS raw data (from serial or sample)
-	print GPSraw,'<- got it'
-		#if GPSraw != '':
-		#print GPSraw
-	#if GPSraw[:6] in parsetype:
-	if GPSraw[:6] == '$GPGGA':
-		(lat,lon,alt,mode) = GPGGA(GPSraw)
-		#(lat,lon,alt) = parsetype[GPSraw[:6]](GPSraw)
-		return lat,lon,alt,mode
-	else:
-		print 'NOT GPGGA'
+	while serGPS.inWaiting():
+		GPSraw = serGPS.readline()	#define the GPS raw data (from serial or sample)
+		print GPSraw,'<- got it'
+			#if GPSraw != '':
+			#print GPSraw
+		#if GPSraw[:6] in parsetype:
+		if GPSraw[:6] == '$GPGGA':
+			(lat,lon,alt,mode,used) = GPGGA(GPSraw)
+			#(lat,lon,alt) = parsetype[GPSraw[:6]](GPSraw)
+			return lat,lon,alt,mode,used
+		else:
+			print 'NOT GPGGA'
 
 def parseArduino():
-	Arduinoraw = serArduino.readline()	#define the GPS raw data (from serial or sample)
-	return speed, (lrange, crange, rrange)
+	twist = "NONE"
+	vel = "NONE"
+	lrange, crange, rrange = ("NONE", "NONE", "NONE")
+	code = "R00"
+	serArduino.read(serArduino.inWaiting())
+	for x in range(10):
+		line = serArduino.readline()	#define the GPS raw data (from serial or sample)
+		if "prime,R" in line: 
+			code = line.strip('\r\n')
+		elif code == "prime,R00": pass
+		elif code == "prime,R60": 
+			lrange = float(line)
+		elif code == "prime,R61": crange = float(line)
+		elif code == "prime,R62": rrange = float(line)
+		elif code == "prime,R37": 
+			code = "twist"
+			vel = float(line)
+			print vel
+		elif code == "twist": 
+			twist = float(line)
+			print twist
+	return twist, vel, (lrange, crange, rrange)
 	
 def main():
 	accel = (0, 0, 0)
 	gyro  =  (0, 0, 0)
-	magne = (0, 0, 0)
+	magne = (1, 2, 3)
 	
 	lat   = 0
 	lon   = 0
@@ -99,36 +131,51 @@ def main():
 	satnum = 0
 	
 	speed = 0
-	rangefinders = (0, 0, 0)
+	twist = 0
+	rangefinders = [0, 0, 0]
+	
+	start = time.time()
 	
 	while True:
 		#Grab data for each sensor, then burst it back to the base station.
-		accel, gyro, magne = parseIMU()
-		speed, rangefinders = parseArduino()
-		try:
-			lat, lon, alt, mode, satnum = parseGPS()
-		except: 
-			pass
+		try:	accel, gyro, magne = parseIMU()
+		except: print "could not parse IMU"
 		
-			"""TO DO: define all of the send codes to return correct information"""
+		try:	
+			twistn, speedn, rangefindersn = parseArduino()
+			if twistn != "NONE": twist = twistn
+			if speedn != "NONE": speed = speedn
+			if rangefindersn[0] != "NONE": rangefinders[0] = rangefindersn[0]
+			if rangefindersn[1] != "NONE": rangefinders[1] = rangefindersn[1]
+			if rangefindersn[2] != "NONE": rangefinders[2] = rangefindersn[2]
+		except: print "could not parse Arduino"
+
+		try:	lat, lon, alt, mode, satnum = parseGPS()
+		except: print "could not parse GPS"
 		
-		heading = atan(magne[0]/magne[1])
+		try:	heading = 180-180/3.1415*atan(magne[0], magne[1])
+		except: print "could not compute heading"
 		
-		linker.write('prime,R00\n')	
-		linker.write('prime,R07\n{}\n'.format(1)) #Tele-op or autonomous
-		linker.write('prime,R37\n{}\n'.format(speed, 0)) 
-		linker.write('prime,R53\n{}\n'.format(heading)) #Heading
-		linker.write('prime,R60\n{}\n'.format(rangefinders[0])) #Need rangefinder info
-		linker.write('prime,R61\n{}\n'.format(rangefinders[1])) #Need rangefinder info
-		linker.write('prime,R62\n{}\n'.format(rangefinders[2])) #Need rangefinder info
-		linker.write('prime,R16\n{}\n'.format(time.time()-start)) #Uptime
-		linker.write('prime,R40\n{}\n{}\n'.format(lat, lon))   #position from GPS
-		#linker.write('prime,R26 ', ['Need more', 'Need more'])   #current waypoint
-		#linker.write('prime,R41 ', ['Not available'])      #accuracy of position
-		linker.write('prime,R42\n{}\n'.format(satnum))  #Number of satellites
+		"""TO DO: define all of the send codes to return correct information"""
+		print "Accel: {}\nGyro: {}\nMagne: {}\n".format(accel, gyro, magne)
+		print "GPS: [{}, {}]\nAlt: {}\nTracking: {}\n".format(lat, lon, alt, satnum)
+		print "Speed: {}\nRangefinders: {}\n".format(speed, rangefinders)
+		print "Heading: {}".format(heading)
+		serXBEE.write('prime,R00\n')	
+		serXBEE.write('prime,R07\n{}\n'.format(1)) #Tele-op or autonomous
+		serXBEE.write('prime,R37\n{}\n{}\n'.format(speed, twist)) 
+		serXBEE.write('prime,R53\n{}\n'.format(heading)) #Heading
+		serXBEE.write('prime,R60\n{}\n'.format(rangefinders[0])) #Need rangefinder info
+		serXBEE.write('prime,R61\n{}\n'.format(rangefinders[1])) #Need rangefinder info
+		serXBEE.write('prime,R62\n{}\n'.format(rangefinders[2])) #Need rangefinder info
+		serXBEE.write('prime,R16\n{}\n'.format(time.time()-start)) #Uptime
+		serXBEE.write('prime,R40\n{}\n{}\n'.format(lat, lon))   #position from GPS
+		#serXBEE.write('prime,R26 ', ['Need more', 'Need more'])   #current waypoint
+		#serXBEE.write('prime,R41 ', ['Not available'])	  #accuracy of position
+		serXBEE.write('prime,R42\n{}\n'.format(satnum))  #Number of satellites
 		#State 5
 		#jpg = open('/home/optimus/Pictures/Webcam/2014-02-23-001737.jpg', 'r').read()
-		#linker.write('prime,R70\n{}'.format(jpg))
+		#serXBEE.write('prime,R70\n{}'.format(jpg))
 		#if robot.state == 5: return
 main()
 
@@ -166,7 +213,7 @@ main()
 ##Buttons!
 #Nope	ui.Button('E-Stop', buttons.kill, 0, 7.5*GRIDDING)
 #Nope	ui.Button('Shutdown', buttons.poweroff, 0*GRIDDING, 8*GRIDDING)
-#Nope	ui.Button('Teleop', buttons.teleautoswitch, 0*GRIDDING, 7*GRIDDING)     
+#Nope	ui.Button('Teleop', buttons.teleautoswitch, 0*GRIDDING, 7*GRIDDING)	 
 #Yep	ui.Button('PrtScr', buttons.screenshot, 12*GRIDDING, 8*GRIDDING)
 #Yep	ui.Button('Reset Map', buttons.mapreset, 11*GRIDDING, 8*GRIDDING)
 
